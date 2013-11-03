@@ -8,18 +8,15 @@ using System.Windows.Forms;
 
 namespace ImgTest
 {
+    /// <summary>
+    /// Gestures obtain their methods to invoke from this class.
+    /// Any method written here can be assigned to a gesture.
+    /// </summary>
     public class Methods
     {
-        public void TestMethod()
-        {
-            MessageBox.Show("TEST");
-        }
-
-        public void MethodTest()
-        {
-            MessageBox.Show("THIS WORKS!");
-        }
-
+        /// <summary>
+        /// Exits the program
+        /// </summary>
         public void ExitProgram()
         {
             Environment.Exit(0);

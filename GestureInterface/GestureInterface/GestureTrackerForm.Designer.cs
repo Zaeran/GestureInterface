@@ -1,6 +1,6 @@
 ﻿namespace ImgTest
 {
-    partial class Form1
+    partial class GestureTrackerForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,9 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.button1 = new System.Windows.Forms.Button();
             this.PicBox = new System.Windows.Forms.PictureBox();
-            this.GestureInfoLabel = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.GestureCreatorTitleText = new System.Windows.Forms.Label();
             this.GestureNameLabel = new System.Windows.Forms.Label();
@@ -59,18 +57,11 @@
             this.GestureCurrentNameVar = new System.Windows.Forms.Label();
             this.GestureCurrentMethodVar = new System.Windows.Forms.Label();
             this.GestureCurrentSequenceVar = new System.Windows.Forms.Label();
+            this.GestureInfoLabel = new System.Windows.Forms.Label();
+            this.GestureTrackerTitleLabel = new System.Windows.Forms.Label();
+            this.GestureMovementSequenceLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.PicBox)).BeginInit();
             this.SuspendLayout();
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(31, 13);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "GO!";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // PicBox
             // 
@@ -80,15 +71,6 @@
             this.PicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.PicBox.TabIndex = 1;
             this.PicBox.TabStop = false;
-            // 
-            // GestureInfoLabel
-            // 
-            this.GestureInfoLabel.AutoSize = true;
-            this.GestureInfoLabel.Location = new System.Drawing.Point(151, 18);
-            this.GestureInfoLabel.Name = "GestureInfoLabel";
-            this.GestureInfoLabel.Size = new System.Drawing.Size(40, 13);
-            this.GestureInfoLabel.TabIndex = 2;
-            this.GestureInfoLabel.Text = "LABEL";
             // 
             // timer1
             // 
@@ -345,11 +327,43 @@
             this.GestureCurrentSequenceVar.TabIndex = 29;
             this.GestureCurrentSequenceVar.Text = "text";
             // 
-            // Form1
+            // GestureInfoLabel
+            // 
+            this.GestureInfoLabel.AutoSize = true;
+            this.GestureInfoLabel.BackColor = System.Drawing.SystemColors.Control;
+            this.GestureInfoLabel.Location = new System.Drawing.Point(518, 25);
+            this.GestureInfoLabel.MinimumSize = new System.Drawing.Size(100, 0);
+            this.GestureInfoLabel.Name = "GestureInfoLabel";
+            this.GestureInfoLabel.Size = new System.Drawing.Size(109, 13);
+            this.GestureInfoLabel.TabIndex = 2;
+            this.GestureInfoLabel.Text = "MoveSequenceLabel";
+            // 
+            // GestureTrackerTitleLabel
+            // 
+            this.GestureTrackerTitleLabel.AutoSize = true;
+            this.GestureTrackerTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.GestureTrackerTitleLabel.Location = new System.Drawing.Point(13, 13);
+            this.GestureTrackerTitleLabel.Name = "GestureTrackerTitleLabel";
+            this.GestureTrackerTitleLabel.Size = new System.Drawing.Size(181, 29);
+            this.GestureTrackerTitleLabel.TabIndex = 30;
+            this.GestureTrackerTitleLabel.Text = "GestureTracker";
+            // 
+            // GestureMovementSequenceLabel
+            // 
+            this.GestureMovementSequenceLabel.AutoSize = true;
+            this.GestureMovementSequenceLabel.Location = new System.Drawing.Point(363, 25);
+            this.GestureMovementSequenceLabel.Name = "GestureMovementSequenceLabel";
+            this.GestureMovementSequenceLabel.Size = new System.Drawing.Size(149, 13);
+            this.GestureMovementSequenceLabel.TabIndex = 31;
+            this.GestureMovementSequenceLabel.Text = "Current movement sequence: ";
+            // 
+            // GestureTrackerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1166, 727);
+            this.Controls.Add(this.GestureMovementSequenceLabel);
+            this.Controls.Add(this.GestureTrackerTitleLabel);
             this.Controls.Add(this.GestureCurrentSequenceVar);
             this.Controls.Add(this.GestureCurrentMethodVar);
             this.Controls.Add(this.GestureCurrentNameVar);
@@ -378,10 +392,10 @@
             this.Controls.Add(this.GestureCreatorTitleText);
             this.Controls.Add(this.GestureInfoLabel);
             this.Controls.Add(this.PicBox);
-            this.Controls.Add(this.button1);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Name = "GestureTrackerForm";
+            this.Text = "GestureTracker";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GestureTrackerForm_FormClosed);
+            this.Load += new System.EventHandler(this.GestureTrackerForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.PicBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -390,9 +404,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.PictureBox PicBox;
-        private System.Windows.Forms.Label GestureInfoLabel;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label GestureCreatorTitleText;
         private System.Windows.Forms.Label GestureNameLabel;
@@ -420,6 +432,9 @@
         private System.Windows.Forms.Label GestureCurrentNameVar;
         private System.Windows.Forms.Label GestureCurrentMethodVar;
         private System.Windows.Forms.Label GestureCurrentSequenceVar;
+        private System.Windows.Forms.Label GestureInfoLabel;
+        private System.Windows.Forms.Label GestureTrackerTitleLabel;
+        private System.Windows.Forms.Label GestureMovementSequenceLabel;
     }
 }
 

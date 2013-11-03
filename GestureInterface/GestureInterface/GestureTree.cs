@@ -7,18 +7,28 @@ using System.Text;
 
 namespace ImgTest
 {
+    /// <summary>
+    /// Holds all gestures in a graph. The graph is navigated from a movement sequence
+    /// </summary>
     class GestureTree
     {
+        //declare variables
         private Node root;
         public Node currentNode;
         private List<Gesture> allGestures = new List<Gesture>();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public GestureTree()
         {
             root = new Node();
             currentNode = root;
         }
 
+        /// <summary>
+        /// Node class for the graph. Stores a gesture and surrounding nodes.
+        /// </summary>
         public class Node
         {
             public Gesture gesture;
@@ -26,6 +36,12 @@ namespace ImgTest
             public List<Node> leafNodes;
             public Node baseNode;
 
+            /// <summary>
+            /// Node constructor
+            /// </summary>
+            /// <param name="g">The gesture assigned to the Node</param>
+            /// <param name="d">the direction of this node from the previous node</param>
+            /// <param name="bNode">the previous node</param>
             public Node(Gesture g = null, int d = 0, Node bNode = null)
             {
                 gesture = g;
@@ -35,6 +51,10 @@ namespace ImgTest
             }
         }
 
+        /// <summary>
+        /// Adds a gesture to the graph
+        /// </summary>
+        /// <param name="g">the gesture to add to the graph</param>
         public void AddGesture(Gesture g)
         {
             ReturnToRoot();
@@ -63,6 +83,10 @@ namespace ImgTest
             
         }
 
+        /// <summary>
+        /// Removes a gesture from the graph
+        /// </summary>
+        /// <param name="g">the gesture to remove from the graph</param>
         public void RemoveGesture(Gesture g)
         {
             ReturnToRoot();
@@ -84,11 +108,19 @@ namespace ImgTest
 
         }
 
+        /// <summary>
+        /// returns to the root node in the graph
+        /// </summary>
         public void ReturnToRoot()
         {
             currentNode = root;
         }
 
+        /// <summary>
+        /// Travels to the next node in a given direction
+        /// </summary>
+        /// <param name="dir">The direction of the next node</param>
+        /// <returns>Returns false if node doesn't exist, or true if traversal is successful</returns>
         public bool GoToNext(int dir)
         {
             if (!NextDirExists(dir))
@@ -102,6 +134,11 @@ namespace ImgTest
             }
         }
 
+        /// <summary>
+        /// Tests that a adjacent node exists in a given direction
+        /// </summary>
+        /// <param name="dir">The direction to test for the given node</param>
+        /// <returns>Returns true if node exists, false if not</returns>
         private bool NextDirExists(int dir)
         {
             foreach (Node l in currentNode.leafNodes)
@@ -114,6 +151,10 @@ namespace ImgTest
             return false;
         }
 
+        /// <summary>
+        /// Sets current node as the adjacent node in the given direstion
+        /// </summary>
+        /// <param name="dir">The direction of the node to select</param>
         private void SelectNode(int dir)
         {
             foreach (Node n in currentNode.leafNodes)
@@ -126,6 +167,11 @@ namespace ImgTest
             }
         }
 
+        /// <summary>
+        /// Returns a gesture based on a given movement sequence
+        /// </summary>
+        /// <param name="seq">a movement sequence</param>
+        /// <returns>returns the gesture associated with the sequence, or null if the gesture doesn't exist</returns>
         public Gesture ReturnGesture(int[] seq)
         {
             ReturnToRoot();
@@ -155,11 +201,20 @@ namespace ImgTest
             return gesture;
         }
 
+        /// <summary>
+        /// Returns a list of all gestures in the tree
+        /// </summary>
+        /// <returns>Returns a list of all gestures in the tree</returns>
         public List<Gesture> ReturnAllGestures()
         {
             return allGestures;
         }
 
+        /// <summary>
+        /// Returns a gesture with a given name
+        /// </summary>
+        /// <param name="name">the name of the gesture to return</param>
+        /// <returns>the gesture associated with the given name, or null if the gesture doesn't exist</returns>
         public Gesture ReturnGestureByName(string name)
         {
             Gesture gest = null;

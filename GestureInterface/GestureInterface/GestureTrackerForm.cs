@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace ImgTest
 {
-    public partial class Form1 : Form
+    public partial class GestureTrackerForm : Form
     {
         //video device
         VideoCaptureDevice videoSource;
@@ -34,13 +34,19 @@ namespace ImgTest
         GestureTree myGestures = new GestureTree();
         ObjTracker objTracker = new ObjTracker();
         Methods methods = new Methods();
-        public Form1()
+        public GestureTrackerForm()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        /// <summary>
+        /// Called when GestureTrackerForm has loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GestureTrackerForm_Load(object sender, EventArgs e)
         {
+            //set initial variables
             FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             timer1.Interval = 100;
             InitializeNodes();
@@ -91,12 +97,19 @@ namespace ImgTest
             }
         }
 
+        /// <summary>
+        /// This code is executed when a new frame is grabbed from the camera
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
         void videoSource_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
         {
             //Cast the frame as Bitmap object and don't forget to use ".Clone()" otherwise
             //you'll probably get access violation exceptions
             Bitmap img = (Bitmap)eventArgs.Frame.Clone();
+            //flip the image horizontaly, so that it's a mirror image of user
             img.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            //draw a red box around the detected colour
             for (int x = points[0]; x <= points[1]; x++)
             {
                 img.SetPixel(x, points[2], Color.Red);
@@ -107,6 +120,7 @@ namespace ImgTest
                 img.SetPixel(points[0], y, Color.Red);
                 img.SetPixel(points[1], y, Color.Red);
             }
+            //timer has gone off, recalculate middle point of colour
             if (ticked)
             {
                 prevMiddlePoint[0] = middlePoint[0];
@@ -115,11 +129,18 @@ namespace ImgTest
                 middlePoint[1] = (points[2] + points[3]) / 2;
                 ticked = false;
             }
+            //set the middle pixel as a green dot
             img.SetPixel(middlePoint[0], middlePoint[1], Color.Green);
+            //set the imageBox image
             PicBox.Image = LockUnlockBitsExample(img);
         }
 
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        /// <summary>
+        /// Code executed when Form1 is closed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GestureTrackerForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             //Stop and free the webcam object if application is closing
             if (videoSource != null && videoSource.IsRunning)
@@ -127,17 +148,17 @@ namespace ImgTest
                 videoSource.SignalToStop();
                 videoSource = null;
             }
+
+            //exit the application
+            Application.Exit();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            long startTime = Environment.TickCount;
-
-            GestureInfoLabel.Text = "Elapsed: " + (Environment.TickCount - startTime).ToString() + "ms";
-        }
-
-        //unlocks bits in bitmap. provides much faster image manipulation
-        //code taken from MSDN site: http://msdn.microsoft.com/en-us/library/5ey6h79d%28v=vs.80%29.aspx
+        /// <summary>
+        /// unlocks bits in bitmap. provides much faster image manipulation
+        /// code taken from MSDN site: http://msdn.microsoft.com/en-us/library/5ey6h79d%28v=vs.80%29.aspx
+        /// </summary>
+        /// <param name="original">The Bitmap passed to the method</param>
+        /// <returns>Returns the modified bitmap</returns>
         private Bitmap LockUnlockBitsExample(Bitmap original)
         {
             // Create a new bitmap.
@@ -213,34 +234,47 @@ namespace ImgTest
             return bmp;
         }
 
-        //get the distance moved since the last frame
+        /// <summary>
+        /// get the distance moved since the last frame
+        /// </summary>
+        /// <returns>Returns the distance moved in pixels</returns>
         private double DistanceMoved()
         {
             double distance = 0;
             int x = 0;
             int y = 0;
+            //calculate x/y difference
             x = Math.Abs(middlePoint[0] - prevMiddlePoint[0]);
             y = Math.Abs(middlePoint[1] - prevMiddlePoint[1]);
 
+            //use pythagoras to get distance moved
             distance = Math.Sqrt((x * x) + (y * y));
 
             return distance;
         }
-        //get the direction moved since the last frame
+
+        /// <summary>
+        /// get the direction moved since the last frame
+        /// </summary>
+        /// <returns>returns an integer representing the direction moved</returns>
         private int DirectionMoved()
         {
-            //directions - 4: right. 0 - left. 2 - up. 6 - down
-            //ie. 0 is left, increment by 1 every 45 degrees CCW
+            //directions:
+            //0 - left.  1 - left/up.  2 - up.  3 - right/up.
+            //  4 - right.  5 - right/down.  6 - down.  7 - left/down.
             double direction = 0;
             int xDir = 0;
             int yDir = 0;
 
+            //calculate the direction moved in radians using atan2, then convert to degrees.
             xDir = prevMiddlePoint[0] - middlePoint[0];
             yDir = prevMiddlePoint[1] - middlePoint[1];
 
             direction = Math.Atan2(yDir, xDir);
             direction *= 180 / Math.PI;
 
+
+            //assign direction integer based on direction moved.
             if (direction < 157.5)
             {
                 if (direction < 112.5)
@@ -276,7 +310,9 @@ namespace ImgTest
             return 4;
         }
 
-        //Create the 'initialization' node
+        /// <summary>
+        /// Creates the 'initialization' node
+        /// </summary>
         private void InitializeNodes()
         {
             Gesture initialize = new Gesture("Initialize", "Must be performed before any other gesture");
@@ -285,18 +321,23 @@ namespace ImgTest
             GestureListBox.Items.Add("Initialize");
         }
 
-        //timer event
+        /// <summary>
+        /// This event triggers each time the timer ticks
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timer1_Tick(object sender, EventArgs e)
         {
+            //let the rest of the program know that the timer has ticked
             ticked = true;
-            //if gesture is complete, determine the correct course of action
+            //if movement sequence is complete, determine the gesture and invoke its assigned method.
             if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
             {
                 int[] sequence = objTracker.ReturnSequence();
                 //test that a gesture exists
-                if (myGestures.ReturnGesture(sequence) != null) //exists
+                if (myGestures.ReturnGesture(sequence) != null) //gesture exists
                 {
-                    //return gesture, then invoke method it holds
+                    //return gesture, then invoke method it holds if gesture returning have been initialized
                     Gesture g = myGestures.ReturnGesture(sequence);
                     if (initialized)
                     {
@@ -304,13 +345,15 @@ namespace ImgTest
                         MethodInfo theMethod = typeof(Methods).GetMethod(g.GetFunction());
                         theMethod.Invoke(methods, null);
                     }
+                    //initialize gesture input if initialize gesture given
                     else if (g.GetName() == "Initialize")
                     {
                         initialized = true;
                     }
                 }
-                else if(sequence.Length != 0) //doesn't exist
+                else if(sequence.Length != 0) //gesture doesn't exist
                 {
+                    //un-initialize the gesture input
                     initialized = false;
                 }
             }
@@ -332,7 +375,13 @@ namespace ImgTest
         }
 
         #region GestureCreation
-        //creates a gesture based on the info provided by the user
+        //
+        /// <summary>
+        /// creates a gesture based on the info provided by the user
+        /// </summary>
+        /// <param name="name">the name of the gesture</param>
+        /// <param name="method">the method name for the gesture to invoke</param>
+        /// <param name="seq">the movement sequence required to activate the gesture</param>
         private void CreateGesture(string name, string method, int[] seq)
         {
             //validate input
@@ -358,13 +407,13 @@ namespace ImgTest
                 //make sure name and sequence don't match pre-existing gestures
                 foreach (Gesture g in myGestures.ReturnAllGestures())
                 {
-                    if (g.GetName() == name)
+                    if (g.GetName() == name) //name already exists
                     {
                         MessageBox.Show("A GESTURE WITH THIS NAME ALREADY EXISTS");
                         isValid = false;
                         break;
                     }
-                    else if (g.GetSequence().Length == seq.Length)
+                    else if (g.GetSequence().Length == seq.Length) //test that the sequence isn't already in use
                     {
                         int[] gSeq = g.GetSequence();
                         isValid = false;
@@ -376,7 +425,7 @@ namespace ImgTest
                                 break;
                             }
                         }
-                        if (!isValid)
+                        if (!isValid) //sequence already exists
                         {
                             MessageBox.Show("A GESTURE WITH THIS SEQUENCE ALREADY EXISTS");
                         }
@@ -404,8 +453,11 @@ namespace ImgTest
             }
         }
 
-        
-        //calls the creategesture method
+        /// <summary>
+        /// calls the creategesture method
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GestureCreateButton_Click(object sender, EventArgs e)
         {
             gestureSequenceCreationList.RemoveFirst();
@@ -496,7 +548,11 @@ namespace ImgTest
         }
         #endregion
 
-        //used to display the gesture sequence as letters in labels
+        /// <summary>
+        /// used to display the gesture sequence as letters in labels
+        /// </summary>
+        /// <param name="l"></param>
+        /// <param name="sequence"></param>
         private void DisplayGestureSequence(Label l, int[] sequence)
         {
             l.Text = "";
@@ -536,7 +592,11 @@ namespace ImgTest
 
         #region GestureViewing
 
-        //ListBox method. used to display the appropriate information about the selected gesture
+        /// <summary>
+        /// ListBox method. used to display the appropriate information about the selected gesture
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GestureListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             Gesture selectedGesture = null;
@@ -558,6 +618,11 @@ namespace ImgTest
             }
         }
 
+        /// <summary>
+        /// Button to remove a gesture
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GestureCurrentRemoveButton_Click(object sender, EventArgs e)
         {
             Gesture selectedGesture = myGestures.ReturnGestureByName(GestureListBox.SelectedItem.ToString());
