@@ -19,10 +19,18 @@ namespace ImgTest
         //video device
         VideoCaptureDevice videoSource;
 
+
         //color box location
         int[] points = new int[4];
-        int[] middlePoint = new int[2];
+        int[] points2 = new int[4];
+        int[] middlePoint = new int[]{0,0};
         int[] prevMiddlePoint = new int[2];
+
+        //mouse double-click location
+        int[] mouseDblClick = new int[2];
+
+        //tracking colour
+        int[] trackColour = new int[3];
 
         //gesture creation sequence
         LinkedList<int> gestureSequenceCreationList = new LinkedList<int>();
@@ -48,16 +56,18 @@ namespace ImgTest
         {
             //set initial variables
             FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            timer1.Interval = 100;
+            timer1.Interval = 33;
             InitializeNodes();
-            gestureSequenceCreationList.AddFirst(10);
+            gestureSequenceCreationList.AddFirst(10); //add an initial value to the sequence creation list. easy way to avoid NullReferenceExceptions.
+            mouseDblClick[0] = -1;
+            mouseDblClick[1] = -1;
+
             //Check if atleast one video source is available.
             //source code borrowed from AForge code examples
             if (videosources != null)
             {
                 //For example use first video device. You may check if this is your webcam.
                 videoSource = new VideoCaptureDevice(videosources[0].MonikerString);
-
                 try
                 {
                     //Check if the video device provides a list of supported resolutions
@@ -93,7 +103,7 @@ namespace ImgTest
                 GestureCurrentNameVar.Text = "";
                 GestureCurrentMethodVar.Text = "";
                 GestureCurrentSequenceVar.Text = "";
-                GestureCreatorSequenceVar.Text = "";
+                GestureCurrentDescriptionVar.Text = "";
             }
         }
 
@@ -109,6 +119,7 @@ namespace ImgTest
             Bitmap img = (Bitmap)eventArgs.Frame.Clone();
             //flip the image horizontaly, so that it's a mirror image of user
             img.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            img = DetectColour(img);
             //draw a red box around the detected colour
             for (int x = points[0]; x <= points[1]; x++)
             {
@@ -132,7 +143,7 @@ namespace ImgTest
             //set the middle pixel as a green dot
             img.SetPixel(middlePoint[0], middlePoint[1], Color.Green);
             //set the imageBox image
-            PicBox.Image = LockUnlockBitsExample(img);
+            PicBox.Image = img;
         }
 
         /// <summary>
@@ -159,7 +170,7 @@ namespace ImgTest
         /// </summary>
         /// <param name="original">The Bitmap passed to the method</param>
         /// <returns>Returns the modified bitmap</returns>
-        private Bitmap LockUnlockBitsExample(Bitmap original)
+        private Bitmap DetectColour(Bitmap original)
         {
             // Create a new bitmap.
             Bitmap bmp = original;
@@ -202,9 +213,10 @@ namespace ImgTest
                     x = 0;
                     y++;
                 }
+
                 //test the colour threshold, and set min/max x/y values accordingly.
-                //currently tests for blue
-                if (rgbValues[counter] / 2.5 > rgbValues[counter + 1] && rgbValues[counter] / 2.5 > rgbValues[counter + 2] && rgbValues[counter] > 120)
+                //currently tests for red
+                if (rgbValues[counter + 2] > 220 && rgbValues[counter + 1] < 100 && rgbValues[counter] < 100)
                 {
                     largestY = y;
                     if (smallestY == 0)
@@ -222,15 +234,20 @@ namespace ImgTest
                 }
             }
 
+            //MessageBox.Show(x + ", " + y);
+
             // Copy the RGB values back to the bitmap
             System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
 
             // Unlock the bits.
             bmp.UnlockBits(bmpData);
-            points[0] = smallestX;
-            points[1] = largestX;
-            points[2] = smallestY;
-            points[3] = largestY;
+            if (smallestY != 0 && largestY != 0)
+            {
+                points[0] = smallestX;
+                points[1] = largestX;
+                points[2] = smallestY;
+                points[3] = largestY;
+            }
             return bmp;
         }
 
@@ -273,23 +290,22 @@ namespace ImgTest
             direction = Math.Atan2(yDir, xDir);
             direction *= 180 / Math.PI;
 
-
             //assign direction integer based on direction moved.
-            if (direction < 157.5)
+            if (direction <= 157.5)
             {
-                if (direction < 112.5)
+                if (direction <= 112.5)
                 {
-                    if (direction < 67.5)
+                    if (direction <= 67.5)
                     {
-                        if (direction < 22.5)
+                        if (direction <= 22.5)
                         {
-                            if (direction < -22.5)
+                            if (direction <= -22.5)
                             {
-                                if (direction < -67.5)
+                                if (direction <= -67.5)
                                 {
-                                    if (direction < -112.5)
+                                    if (direction <= -112.5)
                                     {
-                                        if (direction < -157.5)
+                                        if (direction <= -157.5)
                                         {
                                             return 4;
                                         }
@@ -315,7 +331,7 @@ namespace ImgTest
         /// </summary>
         private void InitializeNodes()
         {
-            Gesture initialize = new Gesture("Initialize", "Must be performed before any other gesture");
+            Gesture initialize = new Gesture("Initialize", "N/A", "Must be performed before any other gesture");
             initialize.SetSequence(new int[]{4, 0});
             myGestures.AddGesture(initialize);
             GestureListBox.Items.Add("Initialize");
@@ -331,6 +347,7 @@ namespace ImgTest
             //let the rest of the program know that the timer has ticked
             ticked = true;
             //if movement sequence is complete, determine the gesture and invoke its assigned method.
+            label1.Text = DistanceMoved().ToString();
             if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
             {
                 int[] sequence = objTracker.ReturnSequence();
@@ -339,22 +356,16 @@ namespace ImgTest
                 {
                     //return gesture, then invoke method it holds if gesture returning have been initialized
                     Gesture g = myGestures.ReturnGesture(sequence);
-                    if (initialized)
+                    if (initialized && g.GetName() != "Initialize")
                     {
-                        initialized = false;
                         MethodInfo theMethod = typeof(Methods).GetMethod(g.GetFunction());
                         theMethod.Invoke(methods, null);
                     }
                     //initialize gesture input if initialize gesture given
                     else if (g.GetName() == "Initialize")
                     {
-                        initialized = true;
+                        initialized = !initialized;
                     }
-                }
-                else if(sequence.Length != 0) //gesture doesn't exist
-                {
-                    //un-initialize the gesture input
-                    initialized = false;
                 }
             }
             //textbox stuff
@@ -372,6 +383,8 @@ namespace ImgTest
             {
                 GestureInfoLabel.Text = str;
             }
+
+            Cursor.Position = new Point((int)(Screen.PrimaryScreen.Bounds.Width * ((double)middlePoint[0] / 640)), (int)(Screen.PrimaryScreen.Bounds.Height * ((double)middlePoint[1] / 480)));
         }
 
         #region GestureCreation
@@ -382,7 +395,7 @@ namespace ImgTest
         /// <param name="name">the name of the gesture</param>
         /// <param name="method">the method name for the gesture to invoke</param>
         /// <param name="seq">the movement sequence required to activate the gesture</param>
-        private void CreateGesture(string name, string method, int[] seq)
+        private void CreateGesture(string name, string method, string description, int[] seq)
         {
             //validate input
             MethodInfo theMethod = typeof(Methods).GetMethod(method);
@@ -437,7 +450,7 @@ namespace ImgTest
             if(isValid)
             {
                 //create gesture
-                Gesture newGesture = new Gesture(name, method);
+                Gesture newGesture = new Gesture(name, method, description);
                 newGesture.SetSequence(seq);
                 myGestures.AddGesture(newGesture);
 
@@ -447,6 +460,7 @@ namespace ImgTest
                 //reset textboxes
                 GestureMethodBox.Text = "";
                 GestureNameBox.Text = "";
+                GestureDescriptionBox.Text = "";
                 //reset gesture sequence
                 gestureSequenceCreationList = new LinkedList<int>();
                 DisplayGestureSequence(GestureCreatorSequenceVar, gestureSequenceCreationList.ToArray());
@@ -461,7 +475,7 @@ namespace ImgTest
         private void GestureCreateButton_Click(object sender, EventArgs e)
         {
             gestureSequenceCreationList.RemoveFirst();
-            CreateGesture(GestureNameBox.Text, GestureMethodBox.Text, gestureSequenceCreationList.ToArray());
+            CreateGesture(GestureNameBox.Text, GestureMethodBox.Text, GestureDescriptionBox.Text, gestureSequenceCreationList.ToArray());
             gestureSequenceCreationList.AddFirst(10);
         }
 
@@ -610,6 +624,7 @@ namespace ImgTest
             {
                 GestureCurrentNameVar.Text = GestureListBox.SelectedItem.ToString();
                 GestureCurrentMethodVar.Text = selectedGesture.GetFunction();
+                GestureCurrentDescriptionVar.Text = selectedGesture.GetDescription();
                 DisplayGestureSequence(GestureCurrentSequenceVar, selectedGesture.GetSequence());
                 if (selectedGesture.GetName() != "Initialize")
                 {
@@ -629,8 +644,19 @@ namespace ImgTest
             myGestures.RemoveGesture(selectedGesture);
             GestureListBox.Items.Remove(GestureListBox.SelectedItem);
             GestureCurrentRemoveButton.Enabled = false;
+
+            GestureCurrentNameVar.Text = "";
+            GestureCurrentMethodVar.Text = "";
+            GestureCurrentSequenceVar.Text = "";
+            GestureCurrentDescriptionVar.Text = "";
         }
         #endregion
+
+        private void PicBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            mouseDblClick[0] = e.X;
+            mouseDblClick[1] = e.Y;
+        }
 
         
     }

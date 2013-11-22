@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace ImgTest
 {
@@ -43,19 +44,20 @@ namespace ImgTest
             //keep note of the amount of time spent moving in a direction.
             //1 tick = 0.1 seconds.
             ticksSinceDirectionStarted++;
-            //execute this if movement has occured in the last 0.5 seconds
-            if (ticksSinceDirectionStarted < 5 || dist > 15)
+            //execute this if movement has occured in the last 0.3 seconds
+            if (ticksSinceDirectionStarted < 3 || (dist > 15 && dist != 0))
             {
                 //if moving in the same direction, add the distance moved to the current total
-                if (dir == dirMoving && dist != 0)
+                if (dir == dirMoving && dist != 0 && dist > 15)
                 {
                     distanceMoved += dist;
                     ticksSinceDirectionStarted = 0;
                 }
                 else //direction has changed
                 {
+                    
                     //if moved far enough in a different direction to previous, add the direction to the sequence list
-                    if (distanceMoved > 50 && dirMoving != dirLastMoved)
+                    if (distanceMoved > 80 && dirMoving != dirLastMoved)
                     {
                         currentSequence.Add(dirMoving);
                         ticksSinceDirectionStarted = 0;
@@ -67,16 +69,21 @@ namespace ImgTest
                 //sequence not yet over
                 return false;
             }
-            else //0.5 seconds of inactivity, gesture sequence complete
+            else //0.3 seconds of inactivity, gesture sequence complete
             {
-                distanceMoved = 0;
-                dirMoving = dir;
-                dirLastMoved = 10;
-                if (ticksSinceDirectionStarted > 5)
+                if (dist != 0)
                 {
-                    ticksSinceDirectionStarted = 0;
+                    distanceMoved = 0;
+                    dirMoving = dir;
+                    dirLastMoved = 10;
+                    if (ticksSinceDirectionStarted > 3)
+                    {
+                        ticksSinceDirectionStarted = 0;
+                    }
+                    
+                    return true;             
                 }
-                return true;
+                return false;
             }
         }
 

@@ -17,17 +17,19 @@ namespace ImgTest
         private List<int> _Sequence;
         private string _Function;
         private string _Name;
+        private string _Description;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="name">The name to give to the gesture</param>
         /// <param name="function">The name of the method that the gesture will invoke</param>
-        public Gesture(string name, string function)
+        public Gesture(string name, string function, string description = "")
         {
             _Sequence = new List<int>();
             _Name = name;
             _Function = function;
+            _Description = description;
         }
 
         /// <summary>
@@ -78,6 +80,15 @@ namespace ImgTest
         public string GetName()
         {
             return _Name;
+        }
+
+        /// <summary>
+        /// Returns the description of the gesture
+        /// </summary>
+        /// <returns>the description of the method this gesture invokes</returns>
+        public string GetDescription()
+        {
+            return _Description;
         }
     }
 }

@@ -60,6 +60,11 @@
             this.GestureInfoLabel = new System.Windows.Forms.Label();
             this.GestureTrackerTitleLabel = new System.Windows.Forms.Label();
             this.GestureMovementSequenceLabel = new System.Windows.Forms.Label();
+            this.GestureDescriptionLabel = new System.Windows.Forms.Label();
+            this.GestureCurrentDescriptionVar = new System.Windows.Forms.Label();
+            this.GestureCurrentDescriptionLabel = new System.Windows.Forms.Label();
+            this.GestureDescriptionBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.PicBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -67,10 +72,11 @@
             // 
             this.PicBox.Location = new System.Drawing.Point(12, 53);
             this.PicBox.Name = "PicBox";
-            this.PicBox.Size = new System.Drawing.Size(802, 433);
+            this.PicBox.Size = new System.Drawing.Size(600, 480);
             this.PicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.PicBox.TabIndex = 1;
             this.PicBox.TabStop = false;
+            this.PicBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PicBox_MouseDoubleClick);
             // 
             // timer1
             // 
@@ -80,7 +86,7 @@
             // 
             this.GestureCreatorTitleText.AutoSize = true;
             this.GestureCreatorTitleText.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureCreatorTitleText.Location = new System.Drawing.Point(842, 23);
+            this.GestureCreatorTitleText.Location = new System.Drawing.Point(654, 56);
             this.GestureCreatorTitleText.Name = "GestureCreatorTitleText";
             this.GestureCreatorTitleText.Size = new System.Drawing.Size(200, 24);
             this.GestureCreatorTitleText.TabIndex = 3;
@@ -90,7 +96,7 @@
             // 
             this.GestureNameLabel.AutoSize = true;
             this.GestureNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureNameLabel.Location = new System.Drawing.Point(842, 80);
+            this.GestureNameLabel.Location = new System.Drawing.Point(654, 113);
             this.GestureNameLabel.Name = "GestureNameLabel";
             this.GestureNameLabel.Size = new System.Drawing.Size(66, 24);
             this.GestureNameLabel.TabIndex = 4;
@@ -100,7 +106,7 @@
             // 
             this.GestureMethodLabel.AutoSize = true;
             this.GestureMethodLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureMethodLabel.Location = new System.Drawing.Point(842, 124);
+            this.GestureMethodLabel.Location = new System.Drawing.Point(654, 157);
             this.GestureMethodLabel.Name = "GestureMethodLabel";
             this.GestureMethodLabel.Size = new System.Drawing.Size(79, 24);
             this.GestureMethodLabel.TabIndex = 5;
@@ -110,7 +116,7 @@
             // 
             this.GestureSequenceLabel.AutoSize = true;
             this.GestureSequenceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureSequenceLabel.Location = new System.Drawing.Point(842, 165);
+            this.GestureSequenceLabel.Location = new System.Drawing.Point(654, 242);
             this.GestureSequenceLabel.Name = "GestureSequenceLabel";
             this.GestureSequenceLabel.Size = new System.Drawing.Size(103, 24);
             this.GestureSequenceLabel.TabIndex = 6;
@@ -118,21 +124,21 @@
             // 
             // GestureNameBox
             // 
-            this.GestureNameBox.Location = new System.Drawing.Point(972, 85);
+            this.GestureNameBox.Location = new System.Drawing.Point(784, 118);
             this.GestureNameBox.Name = "GestureNameBox";
             this.GestureNameBox.Size = new System.Drawing.Size(166, 20);
             this.GestureNameBox.TabIndex = 7;
             // 
             // GestureMethodBox
             // 
-            this.GestureMethodBox.Location = new System.Drawing.Point(972, 129);
+            this.GestureMethodBox.Location = new System.Drawing.Point(784, 162);
             this.GestureMethodBox.Name = "GestureMethodBox";
             this.GestureMethodBox.Size = new System.Drawing.Size(166, 20);
             this.GestureMethodBox.TabIndex = 8;
             // 
             // GestureCreateButton
             // 
-            this.GestureCreateButton.Location = new System.Drawing.Point(832, 304);
+            this.GestureCreateButton.Location = new System.Drawing.Point(644, 381);
             this.GestureCreateButton.Name = "GestureCreateButton";
             this.GestureCreateButton.Size = new System.Drawing.Size(328, 42);
             this.GestureCreateButton.TabIndex = 9;
@@ -144,14 +150,14 @@
             // 
             this.GestureCreatorSequenceVar.AccessibleDescription = "";
             this.GestureCreatorSequenceVar.AutoSize = true;
-            this.GestureCreatorSequenceVar.Location = new System.Drawing.Point(972, 175);
+            this.GestureCreatorSequenceVar.Location = new System.Drawing.Point(786, 250);
             this.GestureCreatorSequenceVar.Name = "GestureCreatorSequenceVar";
             this.GestureCreatorSequenceVar.Size = new System.Drawing.Size(0, 13);
             this.GestureCreatorSequenceVar.TabIndex = 10;
             // 
             // GestureCreatorButtonUp
             // 
-            this.GestureCreatorButtonUp.Location = new System.Drawing.Point(977, 191);
+            this.GestureCreatorButtonUp.Location = new System.Drawing.Point(789, 268);
             this.GestureCreatorButtonUp.Name = "GestureCreatorButtonUp";
             this.GestureCreatorButtonUp.Size = new System.Drawing.Size(30, 23);
             this.GestureCreatorButtonUp.TabIndex = 11;
@@ -161,7 +167,7 @@
             // 
             // GestureCreatorButtonDown
             // 
-            this.GestureCreatorButtonDown.Location = new System.Drawing.Point(977, 275);
+            this.GestureCreatorButtonDown.Location = new System.Drawing.Point(789, 352);
             this.GestureCreatorButtonDown.Name = "GestureCreatorButtonDown";
             this.GestureCreatorButtonDown.Size = new System.Drawing.Size(30, 23);
             this.GestureCreatorButtonDown.TabIndex = 12;
@@ -171,7 +177,7 @@
             // 
             // GestureCreatorButtonRight
             // 
-            this.GestureCreatorButtonRight.Location = new System.Drawing.Point(1034, 233);
+            this.GestureCreatorButtonRight.Location = new System.Drawing.Point(846, 310);
             this.GestureCreatorButtonRight.Name = "GestureCreatorButtonRight";
             this.GestureCreatorButtonRight.Size = new System.Drawing.Size(30, 23);
             this.GestureCreatorButtonRight.TabIndex = 13;
@@ -181,7 +187,7 @@
             // 
             // GestureCreatorButtonLeft
             // 
-            this.GestureCreatorButtonLeft.Location = new System.Drawing.Point(913, 233);
+            this.GestureCreatorButtonLeft.Location = new System.Drawing.Point(725, 310);
             this.GestureCreatorButtonLeft.Name = "GestureCreatorButtonLeft";
             this.GestureCreatorButtonLeft.Size = new System.Drawing.Size(30, 23);
             this.GestureCreatorButtonLeft.TabIndex = 14;
@@ -191,7 +197,7 @@
             // 
             // GestureCreatorButtonUpLeft
             // 
-            this.GestureCreatorButtonUpLeft.Location = new System.Drawing.Point(937, 204);
+            this.GestureCreatorButtonUpLeft.Location = new System.Drawing.Point(749, 281);
             this.GestureCreatorButtonUpLeft.Name = "GestureCreatorButtonUpLeft";
             this.GestureCreatorButtonUpLeft.Size = new System.Drawing.Size(30, 23);
             this.GestureCreatorButtonUpLeft.TabIndex = 15;
@@ -201,7 +207,7 @@
             // 
             // GestureCreatorButtonUpRight
             // 
-            this.GestureCreatorButtonUpRight.Location = new System.Drawing.Point(1013, 204);
+            this.GestureCreatorButtonUpRight.Location = new System.Drawing.Point(825, 281);
             this.GestureCreatorButtonUpRight.Name = "GestureCreatorButtonUpRight";
             this.GestureCreatorButtonUpRight.Size = new System.Drawing.Size(33, 23);
             this.GestureCreatorButtonUpRight.TabIndex = 16;
@@ -211,7 +217,7 @@
             // 
             // GestureCreatorButtonDownLeft
             // 
-            this.GestureCreatorButtonDownLeft.Location = new System.Drawing.Point(937, 262);
+            this.GestureCreatorButtonDownLeft.Location = new System.Drawing.Point(749, 339);
             this.GestureCreatorButtonDownLeft.Name = "GestureCreatorButtonDownLeft";
             this.GestureCreatorButtonDownLeft.Size = new System.Drawing.Size(30, 23);
             this.GestureCreatorButtonDownLeft.TabIndex = 17;
@@ -221,7 +227,7 @@
             // 
             // GestureCreatorButtonDownRight
             // 
-            this.GestureCreatorButtonDownRight.Location = new System.Drawing.Point(1013, 262);
+            this.GestureCreatorButtonDownRight.Location = new System.Drawing.Point(825, 339);
             this.GestureCreatorButtonDownRight.Name = "GestureCreatorButtonDownRight";
             this.GestureCreatorButtonDownRight.Size = new System.Drawing.Size(33, 23);
             this.GestureCreatorButtonDownRight.TabIndex = 18;
@@ -231,7 +237,7 @@
             // 
             // GestureCreatorButtonBack
             // 
-            this.GestureCreatorButtonBack.Location = new System.Drawing.Point(963, 233);
+            this.GestureCreatorButtonBack.Location = new System.Drawing.Point(775, 310);
             this.GestureCreatorButtonBack.Name = "GestureCreatorButtonBack";
             this.GestureCreatorButtonBack.Size = new System.Drawing.Size(55, 23);
             this.GestureCreatorButtonBack.TabIndex = 19;
@@ -244,7 +250,7 @@
             this.GestureListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.GestureListBox.FormattingEnabled = true;
             this.GestureListBox.ItemHeight = 20;
-            this.GestureListBox.Location = new System.Drawing.Point(31, 541);
+            this.GestureListBox.Location = new System.Drawing.Point(17, 567);
             this.GestureListBox.Name = "GestureListBox";
             this.GestureListBox.Size = new System.Drawing.Size(258, 164);
             this.GestureListBox.TabIndex = 20;
@@ -254,7 +260,7 @@
             // 
             this.CurrentGesturesLabel.AutoSize = true;
             this.CurrentGesturesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CurrentGesturesLabel.Location = new System.Drawing.Point(27, 514);
+            this.CurrentGesturesLabel.Location = new System.Drawing.Point(13, 540);
             this.CurrentGesturesLabel.Name = "CurrentGesturesLabel";
             this.CurrentGesturesLabel.Size = new System.Drawing.Size(208, 24);
             this.CurrentGesturesLabel.TabIndex = 21;
@@ -262,7 +268,7 @@
             // 
             // GestureCurrentRemoveButton
             // 
-            this.GestureCurrentRemoveButton.Location = new System.Drawing.Point(344, 649);
+            this.GestureCurrentRemoveButton.Location = new System.Drawing.Point(330, 708);
             this.GestureCurrentRemoveButton.Name = "GestureCurrentRemoveButton";
             this.GestureCurrentRemoveButton.Size = new System.Drawing.Size(118, 23);
             this.GestureCurrentRemoveButton.TabIndex = 23;
@@ -274,7 +280,7 @@
             // 
             this.GestureCurrentNameLabel.AutoSize = true;
             this.GestureCurrentNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureCurrentNameLabel.Location = new System.Drawing.Point(340, 540);
+            this.GestureCurrentNameLabel.Location = new System.Drawing.Point(326, 566);
             this.GestureCurrentNameLabel.Name = "GestureCurrentNameLabel";
             this.GestureCurrentNameLabel.Size = new System.Drawing.Size(59, 20);
             this.GestureCurrentNameLabel.TabIndex = 24;
@@ -284,7 +290,7 @@
             // 
             this.GestureCurrentMethodLabel.AutoSize = true;
             this.GestureCurrentMethodLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureCurrentMethodLabel.Location = new System.Drawing.Point(340, 570);
+            this.GestureCurrentMethodLabel.Location = new System.Drawing.Point(326, 596);
             this.GestureCurrentMethodLabel.Name = "GestureCurrentMethodLabel";
             this.GestureCurrentMethodLabel.Size = new System.Drawing.Size(82, 20);
             this.GestureCurrentMethodLabel.TabIndex = 25;
@@ -294,7 +300,7 @@
             // 
             this.GestureCurrentSequenceLabel.AutoSize = true;
             this.GestureCurrentSequenceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GestureCurrentSequenceLabel.Location = new System.Drawing.Point(340, 600);
+            this.GestureCurrentSequenceLabel.Location = new System.Drawing.Point(326, 626);
             this.GestureCurrentSequenceLabel.Name = "GestureCurrentSequenceLabel";
             this.GestureCurrentSequenceLabel.Size = new System.Drawing.Size(103, 20);
             this.GestureCurrentSequenceLabel.TabIndex = 26;
@@ -303,7 +309,7 @@
             // GestureCurrentNameVar
             // 
             this.GestureCurrentNameVar.AutoSize = true;
-            this.GestureCurrentNameVar.Location = new System.Drawing.Point(500, 545);
+            this.GestureCurrentNameVar.Location = new System.Drawing.Point(486, 571);
             this.GestureCurrentNameVar.Name = "GestureCurrentNameVar";
             this.GestureCurrentNameVar.Size = new System.Drawing.Size(24, 13);
             this.GestureCurrentNameVar.TabIndex = 27;
@@ -312,7 +318,7 @@
             // GestureCurrentMethodVar
             // 
             this.GestureCurrentMethodVar.AutoSize = true;
-            this.GestureCurrentMethodVar.Location = new System.Drawing.Point(500, 575);
+            this.GestureCurrentMethodVar.Location = new System.Drawing.Point(486, 601);
             this.GestureCurrentMethodVar.Name = "GestureCurrentMethodVar";
             this.GestureCurrentMethodVar.Size = new System.Drawing.Size(24, 13);
             this.GestureCurrentMethodVar.TabIndex = 28;
@@ -321,7 +327,7 @@
             // GestureCurrentSequenceVar
             // 
             this.GestureCurrentSequenceVar.AutoSize = true;
-            this.GestureCurrentSequenceVar.Location = new System.Drawing.Point(500, 605);
+            this.GestureCurrentSequenceVar.Location = new System.Drawing.Point(486, 631);
             this.GestureCurrentSequenceVar.Name = "GestureCurrentSequenceVar";
             this.GestureCurrentSequenceVar.Size = new System.Drawing.Size(24, 13);
             this.GestureCurrentSequenceVar.TabIndex = 29;
@@ -357,11 +363,61 @@
             this.GestureMovementSequenceLabel.TabIndex = 31;
             this.GestureMovementSequenceLabel.Text = "Current movement sequence: ";
             // 
+            // GestureDescriptionLabel
+            // 
+            this.GestureDescriptionLabel.AutoSize = true;
+            this.GestureDescriptionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.GestureDescriptionLabel.Location = new System.Drawing.Point(654, 201);
+            this.GestureDescriptionLabel.Name = "GestureDescriptionLabel";
+            this.GestureDescriptionLabel.Size = new System.Drawing.Size(109, 24);
+            this.GestureDescriptionLabel.TabIndex = 32;
+            this.GestureDescriptionLabel.Text = "Description:";
+            // 
+            // GestureCurrentDescriptionVar
+            // 
+            this.GestureCurrentDescriptionVar.AutoSize = true;
+            this.GestureCurrentDescriptionVar.Location = new System.Drawing.Point(486, 661);
+            this.GestureCurrentDescriptionVar.Name = "GestureCurrentDescriptionVar";
+            this.GestureCurrentDescriptionVar.Size = new System.Drawing.Size(24, 13);
+            this.GestureCurrentDescriptionVar.TabIndex = 35;
+            this.GestureCurrentDescriptionVar.Text = "text";
+            // 
+            // GestureCurrentDescriptionLabel
+            // 
+            this.GestureCurrentDescriptionLabel.AutoSize = true;
+            this.GestureCurrentDescriptionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.GestureCurrentDescriptionLabel.Location = new System.Drawing.Point(326, 656);
+            this.GestureCurrentDescriptionLabel.Name = "GestureCurrentDescriptionLabel";
+            this.GestureCurrentDescriptionLabel.Size = new System.Drawing.Size(122, 20);
+            this.GestureCurrentDescriptionLabel.TabIndex = 34;
+            this.GestureCurrentDescriptionLabel.Text = "DESCRIPTION:";
+            // 
+            // GestureDescriptionBox
+            // 
+            this.GestureDescriptionBox.Location = new System.Drawing.Point(784, 205);
+            this.GestureDescriptionBox.Name = "GestureDescriptionBox";
+            this.GestureDescriptionBox.Size = new System.Drawing.Size(166, 20);
+            this.GestureDescriptionBox.TabIndex = 33;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(229, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.TabIndex = 36;
+            this.label1.Text = "label1";
+            // 
             // GestureTrackerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1166, 727);
+            this.ClientSize = new System.Drawing.Size(981, 762);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.GestureCurrentDescriptionVar);
+            this.Controls.Add(this.GestureCurrentDescriptionLabel);
+            this.Controls.Add(this.GestureDescriptionBox);
+            this.Controls.Add(this.GestureDescriptionLabel);
             this.Controls.Add(this.GestureMovementSequenceLabel);
             this.Controls.Add(this.GestureTrackerTitleLabel);
             this.Controls.Add(this.GestureCurrentSequenceVar);
@@ -435,6 +491,11 @@
         private System.Windows.Forms.Label GestureInfoLabel;
         private System.Windows.Forms.Label GestureTrackerTitleLabel;
         private System.Windows.Forms.Label GestureMovementSequenceLabel;
+        private System.Windows.Forms.Label GestureDescriptionLabel;
+        private System.Windows.Forms.Label GestureCurrentDescriptionVar;
+        private System.Windows.Forms.Label GestureCurrentDescriptionLabel;
+        private System.Windows.Forms.TextBox GestureDescriptionBox;
+        private System.Windows.Forms.Label label1;
     }
 }
 
