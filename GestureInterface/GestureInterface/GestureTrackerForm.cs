@@ -1,6 +1,7 @@
 ﻿//Authored by Nathan Beattie
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +12,7 @@ using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace ImgTest
 {
@@ -121,15 +123,18 @@ namespace ImgTest
             img.RotateFlip(RotateFlipType.RotateNoneFlipX);
             img = DetectColour(img);
             //draw a red box around the detected colour
-            for (int x = points[0]; x <= points[1]; x++)
+            if (DistanceMoved() != 0)
             {
-                img.SetPixel(x, points[2], Color.Red);
-                img.SetPixel(x, points[3], Color.Red);
-            }
-            for (int y = points[2]; y <= points[3]; y++)
-            {
-                img.SetPixel(points[0], y, Color.Red);
-                img.SetPixel(points[1], y, Color.Red);
+                for (int x = points[0]; x <= points[1]; x++)
+                {
+                    img.SetPixel(x, points[2], Color.Red);
+                    img.SetPixel(x, points[3], Color.Red);
+                }
+                for (int y = points[2]; y <= points[3]; y++)
+                {
+                    img.SetPixel(points[0], y, Color.Red);
+                    img.SetPixel(points[1], y, Color.Red);
+                }
             }
             //timer has gone off, recalculate middle point of colour
             if (ticked)
@@ -384,9 +389,38 @@ namespace ImgTest
                 GestureInfoLabel.Text = str;
             }
 
-            Cursor.Position = new Point((int)(Screen.PrimaryScreen.Bounds.Width * ((double)middlePoint[0] / 640)), (int)(Screen.PrimaryScreen.Bounds.Height * ((double)middlePoint[1] / 480)));
+            //control mouse
+            //Cursor.Position = new Point((int)(Screen.PrimaryScreen.Bounds.Width * ((double)middlePoint[0] / 640)), (int)(Screen.PrimaryScreen.Bounds.Height * ((double)middlePoint[1] / 480)));
         }
 
+        private void SaveGestures()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(Gesture));
+            List<Gesture> allGestures = myGestures.ReturnAllGestures();
+            for (int i = 0; i < allGestures.Count; i++)
+            {
+                StreamWriter file = new StreamWriter("Gesture-" + allGestures[i].GetName() + ".xml");
+                serializer.Serialize(file, allGestures[i]);
+                file.Close();
+            }
+        }
+
+        private void LoadGestures()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(Gesture));
+            string[] files = System.IO.Directory.GetFiles(".", "Gesture-" + "*.xml", SearchOption.TopDirectoryOnly);
+
+            for(int i = 0; i < files.Length; i++)
+            {
+                StreamReader file = new StreamReader(files[i]);
+                Gesture gesture = (Gesture)serializer.Deserialize(file);
+                file.Close();
+                if (gesture.GetName() != "Initialize")
+                {
+                    CreateGesture(gesture.GetName(), gesture.GetFunction(), gesture.GetDescription(), gesture.GetSequence());
+                }
+            }
+        }
         #region GestureCreation
         //
         /// <summary>
@@ -464,6 +498,7 @@ namespace ImgTest
                 //reset gesture sequence
                 gestureSequenceCreationList = new LinkedList<int>();
                 DisplayGestureSequence(GestureCreatorSequenceVar, gestureSequenceCreationList.ToArray());
+                gestureSequenceCreationList.AddFirst(10);
             }
         }
 
@@ -476,7 +511,6 @@ namespace ImgTest
         {
             gestureSequenceCreationList.RemoveFirst();
             CreateGesture(GestureNameBox.Text, GestureMethodBox.Text, GestureDescriptionBox.Text, gestureSequenceCreationList.ToArray());
-            gestureSequenceCreationList.AddFirst(10);
         }
 
         //button clicks for gesture sequence
@@ -630,6 +664,10 @@ namespace ImgTest
                 {
                     GestureCurrentRemoveButton.Enabled = true;
                 }
+                else
+                {
+                    GestureCurrentRemoveButton.Enabled = false;
+                }
             }
         }
 
@@ -656,6 +694,16 @@ namespace ImgTest
         {
             mouseDblClick[0] = e.X;
             mouseDblClick[1] = e.Y;
+        }
+
+        private void GestureSaveBtn_Click(object sender, EventArgs e)
+        {
+            SaveGestures();
+        }
+
+        private void GestureLoadBtn_Click(object sender, EventArgs e)
+        {
+            LoadGestures();
         }
 
         

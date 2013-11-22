@@ -8,16 +8,17 @@ using System.Reflection;
 
 namespace ImgTest
 {
+    
     /// <summary>
     /// This class handles gestures
     /// </summary>
-    class Gesture
+    public class Gesture
     {
         //declare variables
-        private List<int> _Sequence;
-        private string _Function;
-        private string _Name;
-        private string _Description;
+        public List<int> _Sequence;
+        public string _Function;
+        public string _Name;
+        public string _Description;
 
         /// <summary>
         /// Constructor
@@ -30,6 +31,10 @@ namespace ImgTest
             _Name = name;
             _Function = function;
             _Description = description;
+        }
+
+        public Gesture()
+        {
         }
 
         /// <summary>

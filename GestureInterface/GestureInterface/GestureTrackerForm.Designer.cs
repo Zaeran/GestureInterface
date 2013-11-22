@@ -65,6 +65,8 @@
             this.GestureCurrentDescriptionLabel = new System.Windows.Forms.Label();
             this.GestureDescriptionBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.GestureSaveBtn = new System.Windows.Forms.Button();
+            this.GestureLoadBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PicBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -408,11 +410,33 @@
             this.label1.TabIndex = 36;
             this.label1.Text = "label1";
             // 
+            // GestureSaveBtn
+            // 
+            this.GestureSaveBtn.Location = new System.Drawing.Point(18, 740);
+            this.GestureSaveBtn.Name = "GestureSaveBtn";
+            this.GestureSaveBtn.Size = new System.Drawing.Size(118, 23);
+            this.GestureSaveBtn.TabIndex = 37;
+            this.GestureSaveBtn.Text = "SAVE GESTURES";
+            this.GestureSaveBtn.UseVisualStyleBackColor = true;
+            this.GestureSaveBtn.Click += new System.EventHandler(this.GestureSaveBtn_Click);
+            // 
+            // GestureLoadBtn
+            // 
+            this.GestureLoadBtn.Location = new System.Drawing.Point(157, 740);
+            this.GestureLoadBtn.Name = "GestureLoadBtn";
+            this.GestureLoadBtn.Size = new System.Drawing.Size(118, 23);
+            this.GestureLoadBtn.TabIndex = 38;
+            this.GestureLoadBtn.Text = "LOAD GESTURES";
+            this.GestureLoadBtn.UseVisualStyleBackColor = true;
+            this.GestureLoadBtn.Click += new System.EventHandler(this.GestureLoadBtn_Click);
+            // 
             // GestureTrackerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(981, 762);
+            this.ClientSize = new System.Drawing.Size(981, 775);
+            this.Controls.Add(this.GestureLoadBtn);
+            this.Controls.Add(this.GestureSaveBtn);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.GestureCurrentDescriptionVar);
             this.Controls.Add(this.GestureCurrentDescriptionLabel);
@@ -496,6 +520,8 @@
         private System.Windows.Forms.Label GestureCurrentDescriptionLabel;
         private System.Windows.Forms.TextBox GestureDescriptionBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button GestureSaveBtn;
+        private System.Windows.Forms.Button GestureLoadBtn;
     }
 }
 

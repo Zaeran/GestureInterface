@@ -34,7 +34,7 @@ namespace ImgTest
 
         public void Message()
         {
-            MessageBox.Show("MESSAGE");
+            MessageBox.Show("HELLO WORLD!");
         }
 
         public void OpenSong()
