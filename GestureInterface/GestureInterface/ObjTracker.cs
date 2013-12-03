@@ -44,11 +44,11 @@ namespace ImgTest
             //keep note of the amount of time spent moving in a direction.
             //1 tick = 1 frame.
             ticksSinceDirectionStarted++;
-            //execute this if movement has occured in the last 0.3 seconds
-            if (ticksSinceDirectionStarted < 5 || (dist > 8 && dist != 0))
+            //execute this if movement has occured in the last 5 frames
+            if (ticksSinceDirectionStarted < 5 || (dist > 10 && dist != 0))
             {
                 //if moving in the same direction, add the distance moved to the current total
-                if (dir == dirMoving && dist != 0 && dist > 8)
+                if (dir == dirMoving && dist != 0 && dist > 10)
                 {
                     distanceMoved += dist;
                     ticksSinceDirectionStarted = 0;
@@ -56,7 +56,7 @@ namespace ImgTest
                 else //direction has changed
                 {                  
                     //if moved far enough in a different direction to previous, add the direction to the sequence list
-                    if (distanceMoved > 50 && dirMoving != dirLastMoved)
+                    if (distanceMoved > 25 && dirMoving != dirLastMoved)
                     {
                         currentSequence.Add(dirMoving);
                         ticksSinceDirectionStarted = 0;
@@ -64,11 +64,17 @@ namespace ImgTest
                     }
                     distanceMoved = 0;
                     dirMoving = dir;
+                    if (dist > 100)
+                    {
+                        currentSequence.Add(dirMoving);
+                        ticksSinceDirectionStarted = 0;
+                        dirLastMoved = dirMoving;
+                    }
                 }
                 //sequence not yet over
                 return false;
             }
-            else //0.3 seconds of inactivity, gesture sequence complete
+            else //5 frames seconds of inactivity, gesture sequence complete
             {
                 if (dist != 0 || ticksSinceDirectionStarted > 7)
                 {

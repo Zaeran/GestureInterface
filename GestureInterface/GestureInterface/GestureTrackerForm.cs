@@ -20,7 +20,7 @@ namespace ImgTest
     {
         //video device
         VideoCaptureDevice videoSource;
-        int ticks = 0;
+        int framesSincelastSeen = 0;
 
         //color box location
         int[] middlePoint = new int[]{0,0};
@@ -127,8 +127,11 @@ namespace ImgTest
             img = DetectColour(img);
 
             //recalculate middle point of colour
-            prevMiddlePoint[0] = middlePoint[0];
-            prevMiddlePoint[1] = middlePoint[1];
+            if (DistanceMoved() != 0 || framesSincelastSeen > 10)
+            {
+                prevMiddlePoint[0] = middlePoint[0];
+                prevMiddlePoint[1] = middlePoint[1];
+            }
 
             middlePoint[0] = avgPositionX;
             middlePoint[1] = avgPositionY;
@@ -241,7 +244,7 @@ namespace ImgTest
                     //test the colour threshold, and set min/max x/y values accordingly.
                     //currently tests for skin
                     //if (crColour > 130 && crColour < 150 && cbColour > 130 && cbColour < 145 && crColourPrev > 130 && crColourPrev < 150 && cbColourPrev > 130 && cbColourPrev < 145)
-                    if ((Math.Abs(middlePoint[0] - x) < 50 && Math.Abs(middlePoint[1] - y) < 50) || (middlePoint[0] == 0 && middlePoint[1] == 0))
+                    if ((Math.Abs(middlePoint[0] - x) < 50 && Math.Abs(middlePoint[1] - y) < 50) || (middlePoint[0] == 0 && middlePoint[1] == 0) || framesSincelastSeen < 10)
                     {
                         if (crColour > 175 && cbColour < 130)
                         {
@@ -259,11 +262,16 @@ namespace ImgTest
             {
                 avgPositionX /= pixelNumber;
                 avgPositionY /= pixelNumber;
+                framesSincelastSeen = 0;
             }
             else
             {
-                avgPositionX = 0;
-                avgPositionY = 0;
+                if (framesSincelastSeen > 10)
+                {
+                    avgPositionX = 0;
+                    avgPositionY = 0;
+                }
+                framesSincelastSeen++;
             }
 
             //set previous frame to current frame
@@ -411,6 +419,7 @@ namespace ImgTest
                 GestureInfoLabel.Text = str;
             }
 
+            label1.Text = prevMiddlePoint[0].ToString();
             //control mouse
             //Cursor.Position = new Point((int)(Screen.PrimaryScreen.Bounds.Width * ((double)middlePoint[0] / 640)), (int)(Screen.PrimaryScreen.Bounds.Height * ((double)middlePoint[1] / 480)));
         }
