@@ -42,22 +42,21 @@ namespace ImgTest
         public bool TrackPosition(double dist, int dir)
         {
             //keep note of the amount of time spent moving in a direction.
-            //1 tick = 0.1 seconds.
+            //1 tick = 0.033 seconds.
             ticksSinceDirectionStarted++;
             //execute this if movement has occured in the last 0.3 seconds
-            if (ticksSinceDirectionStarted < 3 || (dist > 15 && dist != 0))
+            if (ticksSinceDirectionStarted < 9 || (dist > 10 && dist != 0))
             {
                 //if moving in the same direction, add the distance moved to the current total
-                if (dir == dirMoving && dist != 0 && dist > 15)
+                if (dir == dirMoving && dist != 0 && dist > 10)
                 {
                     distanceMoved += dist;
                     ticksSinceDirectionStarted = 0;
                 }
                 else //direction has changed
-                {
-                    
+                {                  
                     //if moved far enough in a different direction to previous, add the direction to the sequence list
-                    if (distanceMoved > 80 && dirMoving != dirLastMoved)
+                    if (distanceMoved > 65 && dirMoving != dirLastMoved)
                     {
                         currentSequence.Add(dirMoving);
                         ticksSinceDirectionStarted = 0;
@@ -71,7 +70,7 @@ namespace ImgTest
             }
             else //0.3 seconds of inactivity, gesture sequence complete
             {
-                if (dist != 0)
+                if (dist != 0 || ticksSinceDirectionStarted > 15)
                 {
                     distanceMoved = 0;
                     dirMoving = dir;

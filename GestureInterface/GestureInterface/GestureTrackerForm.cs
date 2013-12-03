@@ -20,7 +20,9 @@ namespace ImgTest
     {
         //video device
         VideoCaptureDevice videoSource;
-
+        int frameCount = 0;
+        int ticks = 0;
+        string s = "";
 
         //color box location
         int[] points = new int[4];
@@ -33,6 +35,9 @@ namespace ImgTest
 
         //tracking colour
         int[] trackColour = new int[3];
+        byte[] prevFrame = new byte[0];
+        int avgPositionX = 0;
+        int avgPositionY = 0;
 
         //gesture creation sequence
         LinkedList<int> gestureSequenceCreationList = new LinkedList<int>();
@@ -58,7 +63,7 @@ namespace ImgTest
         {
             //set initial variables
             FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            timer1.Interval = 33;
+            timer1.Interval = 50;
             InitializeNodes();
             gestureSequenceCreationList.AddFirst(10); //add an initial value to the sequence creation list. easy way to avoid NullReferenceExceptions.
             mouseDblClick[0] = -1;
@@ -81,6 +86,7 @@ namespace ImgTest
                         {
                             if (videoSource.VideoCapabilities[i].FrameSize.Width > Convert.ToInt32(highestSolution.Split(';')[0]))
                                 highestSolution = videoSource.VideoCapabilities[i].FrameSize.Width.ToString() + ";" + i.ToString();
+                            s = highestSolution;
                         }
                     }
                 }
@@ -121,9 +127,11 @@ namespace ImgTest
             Bitmap img = (Bitmap)eventArgs.Frame.Clone();
             //flip the image horizontaly, so that it's a mirror image of user
             img.RotateFlip(RotateFlipType.RotateNoneFlipX);
+
             img = DetectColour(img);
             //draw a red box around the detected colour
-            if (DistanceMoved() != 0)
+            
+            if (DistanceMoved() != 0 && points[2] != 0 && points[3] != 0)
             {
                 for (int x = points[0]; x <= points[1]; x++)
                 {
@@ -141,14 +149,13 @@ namespace ImgTest
             {
                 prevMiddlePoint[0] = middlePoint[0];
                 prevMiddlePoint[1] = middlePoint[1];
-                middlePoint[0] = (points[0] + points[1]) / 2;
-                middlePoint[1] = (points[2] + points[3]) / 2;
+                //middlePoint[0] = (points[0] + points[1]) / 2;
+                //middlePoint[1] = (points[2] + points[3]) / 2;
                 ticked = false;
             }
-            //set the middle pixel as a green dot
-            img.SetPixel(middlePoint[0], middlePoint[1], Color.Green);
             //set the imageBox image
             PicBox.Image = img;
+            frameCount++;
         }
 
         /// <summary>
@@ -208,6 +215,8 @@ namespace ImgTest
             int smallestX = width - 1;
             int largestY = 0;
             int smallestY = 0;
+
+            int pixelNumber = 0;
             //go through image, search for specified colour
             for (int counter = 0; counter < rgbValues.Length; counter += 3) //24bit image produced by webcam. +=3 because 3 channels: r, g, b.
             {
@@ -219,28 +228,55 @@ namespace ImgTest
                     y++;
                 }
 
-                //test the colour threshold, and set min/max x/y values accordingly.
-                //currently tests for red
-                if (rgbValues[counter + 2] > 220 && rgbValues[counter + 1] < 100 && rgbValues[counter] < 100)
+                //convert to YCbCr color space
+                //this gives us a color value relatively independant of luminousity
+                double yColour = 0.257 * rgbValues[counter + 2] + 0.504 * rgbValues[counter + 1] + 0.098 * rgbValues[counter] + 16;
+                double crColour = 0.439 * rgbValues[counter + 2] - 0.368 * rgbValues[counter + 1] - 0.071 * rgbValues[counter] + 128;
+                double cbColour = -0.148 * rgbValues[counter + 2] - 0.291 * rgbValues[counter + 1] + 0.439 * rgbValues[counter] + 128;
+
+                if (prevFrame.Length > 1)
                 {
-                    largestY = y;
-                    if (smallestY == 0)
+                    double yColourPrev = 0.257 * prevFrame[counter + 2] + 0.504 * prevFrame[counter + 1] + 0.098 * prevFrame[counter] + 16;
+                    double crColourPrev = 0.439 * prevFrame[counter + 2] - 0.368 * prevFrame[counter + 1] - 0.071 * prevFrame[counter] + 128;
+                    double cbColourPrev = -0.148 * prevFrame[counter + 2] - 0.291 * prevFrame[counter + 1] + 0.439 * prevFrame[counter] + 128;
+                    //test the colour threshold, and set min/max x/y values accordingly.
+                    //currently tests for skin
+                    if (crColour > 130 && crColour < 150 && cbColour > 130 && cbColour < 145 && crColourPrev > 130 && crColourPrev < 150 && cbColourPrev > 130 && cbColourPrev < 145)
                     {
-                        smallestY = y;
-                    }
-                    if (x < smallestX)
-                    {
-                        smallestX = x;
-                    }
-                    if (x > largestX)
-                    {
-                        largestX = x;
+                        /**
+                        largestY = y;
+                        if (smallestY == 0)
+                        {
+                            smallestY = y;
+                        }
+                        if (x < smallestX)
+                        {
+                            smallestX = x;
+                        }
+                        if (x > largestX)
+                        {
+                            largestX = x;
+                        }
+                         * **/
+                        rgbValues[counter] = 255;
+                        rgbValues[counter + 1] = 255;
+                        rgbValues[counter + 2] = 255;
+                        pixelNumber++;
+                        avgPositionX += x;
+                        avgPositionY += y;
                     }
                 }
             }
+            if (pixelNumber != 0)
+            {
+                avgPositionX /= pixelNumber;
+                avgPositionY /= pixelNumber;
+                MessageBox.Show(pixelNumber.ToString());
+            }
 
-            //MessageBox.Show(x + ", " + y);
 
+            //set previous frame to current frame
+            prevFrame = rgbValues;
             // Copy the RGB values back to the bitmap
             System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
 
@@ -348,11 +384,21 @@ namespace ImgTest
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void timer1_Tick(object sender, EventArgs e)
-        {
+        {            
             //let the rest of the program know that the timer has ticked
             ticked = true;
+            ticks++;
+            /**
+            if (ticks % 30 == 0)
+            {
+                label1.Text = s;
+                frameCount = 0;
+            }
+             * **/
+
+            label1.Text = avgPositionY.ToString();
+
             //if movement sequence is complete, determine the gesture and invoke its assigned method.
-            label1.Text = DistanceMoved().ToString();
             if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
             {
                 int[] sequence = objTracker.ReturnSequence();
