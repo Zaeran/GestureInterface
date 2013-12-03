@@ -20,13 +20,9 @@ namespace ImgTest
     {
         //video device
         VideoCaptureDevice videoSource;
-        int frameCount = 0;
         int ticks = 0;
-        string s = "";
 
         //color box location
-        int[] points = new int[4];
-        int[] points2 = new int[4];
         int[] middlePoint = new int[]{0,0};
         int[] prevMiddlePoint = new int[2];
 
@@ -42,7 +38,6 @@ namespace ImgTest
         //gesture creation sequence
         LinkedList<int> gestureSequenceCreationList = new LinkedList<int>();
 
-        bool ticked = true; //used to alert the rest of the program when timer has ticked
         bool initialized = false; //when true, gestures can be initialized
 
         //classes
@@ -63,11 +58,17 @@ namespace ImgTest
         {
             //set initial variables
             FilterInfoCollection videosources = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            timer1.Interval = 50;
             InitializeNodes();
             gestureSequenceCreationList.AddFirst(10); //add an initial value to the sequence creation list. easy way to avoid NullReferenceExceptions.
             mouseDblClick[0] = -1;
             mouseDblClick[1] = -1;
+
+            //start the timer
+            timer1.Interval = 50;
+            if (!timer1.Enabled)
+            {
+                timer1.Start();
+            }
 
             //Check if atleast one video source is available.
             //source code borrowed from AForge code examples
@@ -86,7 +87,6 @@ namespace ImgTest
                         {
                             if (videoSource.VideoCapabilities[i].FrameSize.Width > Convert.ToInt32(highestSolution.Split(';')[0]))
                                 highestSolution = videoSource.VideoCapabilities[i].FrameSize.Width.ToString() + ";" + i.ToString();
-                            s = highestSolution;
                         }
                     }
                 }
@@ -96,12 +96,6 @@ namespace ImgTest
                 videoSource.NewFrame += new AForge.Video.NewFrameEventHandler(videoSource_NewFrame);
                 //Start recording
                 videoSource.Start();
-
-                //start the timer
-                if (!timer1.Enabled)
-                {
-                    timer1.Start();
-                }
 
                 //set GestureListBox parameters
                 GestureListBox.SelectionMode = SelectionMode.One;
@@ -122,6 +116,8 @@ namespace ImgTest
         /// <param name="eventArgs"></param>
         void videoSource_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
         {
+            const int boxSize = 10;
+
             //Cast the frame as Bitmap object and don't forget to use ".Clone()" otherwise
             //you'll probably get access violation exceptions
             Bitmap img = (Bitmap)eventArgs.Frame.Clone();
@@ -129,33 +125,40 @@ namespace ImgTest
             img.RotateFlip(RotateFlipType.RotateNoneFlipX);
 
             img = DetectColour(img);
+
+            //recalculate middle point of colour
+            prevMiddlePoint[0] = middlePoint[0];
+            prevMiddlePoint[1] = middlePoint[1];
+
+            middlePoint[0] = avgPositionX;
+            middlePoint[1] = avgPositionY;
+
             //draw a red box around the detected colour
-            
-            if (DistanceMoved() != 0 && points[2] != 0 && points[3] != 0)
+            int midX = middlePoint[0];
+            int midY = middlePoint[1];
+            if (DistanceMoved() != 0 || midX != 0 && midY != 0)
             {
-                for (int x = points[0]; x <= points[1]; x++)
+                for (int x = -boxSize; x <= boxSize; x++)
                 {
-                    img.SetPixel(x, points[2], Color.Red);
-                    img.SetPixel(x, points[3], Color.Red);
+                    if (midX + x > 0 && midX + x < img.Width && midY - boxSize > 0 && midY + boxSize < img.Height)
+                    {
+                        img.SetPixel(midX + x, midY + boxSize, Color.Red);
+                        img.SetPixel(midX + x, midY - boxSize, Color.Red);
+                    }
                 }
-                for (int y = points[2]; y <= points[3]; y++)
+                for (int y = -boxSize; y <= boxSize; y++)
                 {
-                    img.SetPixel(points[0], y, Color.Red);
-                    img.SetPixel(points[1], y, Color.Red);
+                    if (midY + y > 0 && midY + y < img.Height && midX - boxSize > 0 && midX + boxSize < img.Width)
+                    {
+                        img.SetPixel(midX + boxSize, midY + y, Color.Red);
+                        img.SetPixel(midX - boxSize, midY + y, Color.Red);
+                    }
                 }
             }
-            //timer has gone off, recalculate middle point of colour
-            if (ticked)
-            {
-                prevMiddlePoint[0] = middlePoint[0];
-                prevMiddlePoint[1] = middlePoint[1];
-                //middlePoint[0] = (points[0] + points[1]) / 2;
-                //middlePoint[1] = (points[2] + points[3]) / 2;
-                ticked = false;
-            }
+          
             //set the imageBox image
             PicBox.Image = img;
-            frameCount++;
+            TrackObject();
         }
 
         /// <summary>
@@ -211,10 +214,6 @@ namespace ImgTest
             int y = -1;
             int width = bmp.Width;
             int height = bmp.Height;
-            int largestX = 0;
-            int smallestX = width - 1;
-            int largestY = 0;
-            int smallestY = 0;
 
             int pixelNumber = 0;
             //go through image, search for specified colour
@@ -241,29 +240,18 @@ namespace ImgTest
                     double cbColourPrev = -0.148 * prevFrame[counter + 2] - 0.291 * prevFrame[counter + 1] + 0.439 * prevFrame[counter] + 128;
                     //test the colour threshold, and set min/max x/y values accordingly.
                     //currently tests for skin
-                    if (crColour > 130 && crColour < 150 && cbColour > 130 && cbColour < 145 && crColourPrev > 130 && crColourPrev < 150 && cbColourPrev > 130 && cbColourPrev < 145)
+                    //if (crColour > 130 && crColour < 150 && cbColour > 130 && cbColour < 145 && crColourPrev > 130 && crColourPrev < 150 && cbColourPrev > 130 && cbColourPrev < 145)
+                    if ((Math.Abs(middlePoint[0] - x) < 50 && Math.Abs(middlePoint[1] - y) < 50) || (middlePoint[0] == 0 && middlePoint[1] == 0))
                     {
-                        /**
-                        largestY = y;
-                        if (smallestY == 0)
+                        if (crColour > 175 && cbColour < 130)
                         {
-                            smallestY = y;
+                            rgbValues[counter] = 255;
+                            rgbValues[counter + 1] = 255;
+                            rgbValues[counter + 2] = 255;
+                            pixelNumber++;
+                            avgPositionX += x;
+                            avgPositionY += y;
                         }
-                        if (x < smallestX)
-                        {
-                            smallestX = x;
-                        }
-                        if (x > largestX)
-                        {
-                            largestX = x;
-                        }
-                         * **/
-                        rgbValues[counter] = 255;
-                        rgbValues[counter + 1] = 255;
-                        rgbValues[counter + 2] = 255;
-                        pixelNumber++;
-                        avgPositionX += x;
-                        avgPositionY += y;
                     }
                 }
             }
@@ -271,9 +259,12 @@ namespace ImgTest
             {
                 avgPositionX /= pixelNumber;
                 avgPositionY /= pixelNumber;
-                MessageBox.Show(pixelNumber.ToString());
             }
-
+            else
+            {
+                avgPositionX = 0;
+                avgPositionY = 0;
+            }
 
             //set previous frame to current frame
             prevFrame = rgbValues;
@@ -282,14 +273,32 @@ namespace ImgTest
 
             // Unlock the bits.
             bmp.UnlockBits(bmpData);
-            if (smallestY != 0 && largestY != 0)
-            {
-                points[0] = smallestX;
-                points[1] = largestX;
-                points[2] = smallestY;
-                points[3] = largestY;
-            }
             return bmp;
+        }
+
+        private void TrackObject()
+        {
+            //if movement sequence is complete, determine the gesture and invoke its assigned method.
+            if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
+            {
+                int[] sequence = objTracker.ReturnSequence();
+                //test that a gesture exists
+                if (myGestures.ReturnGesture(sequence) != null) //gesture exists
+                {
+                    //return gesture, then invoke method it holds if gesture returning have been initialized
+                    Gesture g = myGestures.ReturnGesture(sequence);
+                    if (initialized && g.GetName() != "Initialize")
+                    {
+                        MethodInfo theMethod = typeof(Methods).GetMethod(g.GetFunction());
+                        theMethod.Invoke(methods, null);
+                    }
+                    //initialize gesture input if initialize gesture given
+                    else if (g.GetName() == "Initialize")
+                    {
+                        initialized = !initialized;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -380,45 +389,12 @@ namespace ImgTest
 
         /// <summary>
         /// This event triggers each time the timer ticks
+        /// it is used to update the real-time text boxes
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void timer1_Tick(object sender, EventArgs e)
+        private void textBoxTimerTick(object sender, EventArgs e)
         {            
-            //let the rest of the program know that the timer has ticked
-            ticked = true;
-            ticks++;
-            /**
-            if (ticks % 30 == 0)
-            {
-                label1.Text = s;
-                frameCount = 0;
-            }
-             * **/
-
-            label1.Text = avgPositionY.ToString();
-
-            //if movement sequence is complete, determine the gesture and invoke its assigned method.
-            if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
-            {
-                int[] sequence = objTracker.ReturnSequence();
-                //test that a gesture exists
-                if (myGestures.ReturnGesture(sequence) != null) //gesture exists
-                {
-                    //return gesture, then invoke method it holds if gesture returning have been initialized
-                    Gesture g = myGestures.ReturnGesture(sequence);
-                    if (initialized && g.GetName() != "Initialize")
-                    {
-                        MethodInfo theMethod = typeof(Methods).GetMethod(g.GetFunction());
-                        theMethod.Invoke(methods, null);
-                    }
-                    //initialize gesture input if initialize gesture given
-                    else if (g.GetName() == "Initialize")
-                    {
-                        initialized = !initialized;
-                    }
-                }
-            }
             //textbox stuff
             string str = "";
             if (initialized)
@@ -750,8 +726,6 @@ namespace ImgTest
         private void GestureLoadBtn_Click(object sender, EventArgs e)
         {
             LoadGestures();
-        }
-
-        
+        }   
     }
 }

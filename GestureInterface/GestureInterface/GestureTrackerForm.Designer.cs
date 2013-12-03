@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.PicBox = new System.Windows.Forms.PictureBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.GestureCreatorTitleText = new System.Windows.Forms.Label();
             this.GestureNameLabel = new System.Windows.Forms.Label();
             this.GestureMethodLabel = new System.Windows.Forms.Label();
@@ -67,6 +66,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.GestureSaveBtn = new System.Windows.Forms.Button();
             this.GestureLoadBtn = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.PicBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -79,10 +79,6 @@
             this.PicBox.TabIndex = 1;
             this.PicBox.TabStop = false;
             this.PicBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PicBox_MouseDoubleClick);
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // GestureCreatorTitleText
             // 
@@ -430,6 +426,10 @@
             this.GestureLoadBtn.UseVisualStyleBackColor = true;
             this.GestureLoadBtn.Click += new System.EventHandler(this.GestureLoadBtn_Click);
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.textBoxTimerTick);
+            // 
             // GestureTrackerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -485,7 +485,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox PicBox;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label GestureCreatorTitleText;
         private System.Windows.Forms.Label GestureNameLabel;
         private System.Windows.Forms.Label GestureMethodLabel;
@@ -522,6 +521,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button GestureSaveBtn;
         private System.Windows.Forms.Button GestureLoadBtn;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
