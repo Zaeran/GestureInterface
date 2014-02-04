@@ -30,10 +30,12 @@ namespace ImgTest
         int[] mouseDblClick = new int[2];
 
         //tracking colour
-        int[] trackColour = new int[3];
+        double[] trackColour = new double[2];
         byte[] prevFrame = new byte[0];
         int avgPositionX = 0;
         int avgPositionY = 0;
+        bool startTrack = false;
+        bool trackingStarted = false;
 
         //gesture creation sequence
         LinkedList<int> gestureSequenceCreationList = new LinkedList<int>();
@@ -126,42 +128,66 @@ namespace ImgTest
 
             img = DetectColour(img);
 
-            //recalculate middle point of colour
-            if (DistanceMoved() != 0 || framesSincelastSeen > 10)
+            if (!trackingStarted)
             {
-                prevMiddlePoint[0] = middlePoint[0];
-                prevMiddlePoint[1] = middlePoint[1];
-            }
-
-            middlePoint[0] = avgPositionX;
-            middlePoint[1] = avgPositionY;
-
-            //draw a red box around the detected colour
-            int midX = middlePoint[0];
-            int midY = middlePoint[1];
-            if (DistanceMoved() != 0 || midX != 0 && midY != 0)
-            {
+                middlePoint[0] = 320;
+                middlePoint[1] = 240;
+                avgPositionX = 320;
+                avgPositionY = 240;
                 for (int x = -boxSize; x <= boxSize; x++)
                 {
-                    if (midX + x > 0 && midX + x < img.Width && midY - boxSize > 0 && midY + boxSize < img.Height)
-                    {
-                        img.SetPixel(midX + x, midY + boxSize, Color.Red);
-                        img.SetPixel(midX + x, midY - boxSize, Color.Red);
-                    }
+                    img.SetPixel(320 + x, 240 + boxSize, Color.Red);
+                    img.SetPixel(320 + x, 240 - boxSize, Color.Red);
                 }
                 for (int y = -boxSize; y <= boxSize; y++)
                 {
-                    if (midY + y > 0 && midY + y < img.Height && midX - boxSize > 0 && midX + boxSize < img.Width)
+                    img.SetPixel(320 + boxSize, 240 + y, Color.Red);
+                    img.SetPixel(320 - boxSize, 240 + y, Color.Red);
+                }
+            }
+            else
+            {
+                //recalculate middle point of colour
+                if (DistanceMoved() != 0 || framesSincelastSeen > 10)
+                {
+                    prevMiddlePoint[0] = middlePoint[0];
+                    prevMiddlePoint[1] = middlePoint[1];
+                }
+
+                middlePoint[0] = avgPositionX;
+                middlePoint[1] = avgPositionY;
+
+                //draw a red box around the detected colour
+                int midX = middlePoint[0];
+                int midY = middlePoint[1];
+
+                if (DistanceMoved() != 0 || midX != 0 && midY != 0)
+                {
+                    for (int x = -boxSize; x <= boxSize; x++)
                     {
-                        img.SetPixel(midX + boxSize, midY + y, Color.Red);
-                        img.SetPixel(midX - boxSize, midY + y, Color.Red);
+                        if (midX + x > 0 && midX + x < img.Width && midY - boxSize > 0 && midY + boxSize < img.Height)
+                        {
+                            img.SetPixel(midX + x, midY + boxSize, Color.Red);
+                            img.SetPixel(midX + x, midY - boxSize, Color.Red);
+                        }
+                    }
+                    for (int y = -boxSize; y <= boxSize; y++)
+                    {
+                        if (midY + y > 0 && midY + y < img.Height && midX - boxSize > 0 && midX + boxSize < img.Width)
+                        {
+                            img.SetPixel(midX + boxSize, midY + y, Color.Red);
+                            img.SetPixel(midX - boxSize, midY + y, Color.Red);
+                        }
                     }
                 }
             }
           
             //set the imageBox image
             PicBox.Image = img;
-            TrackObject();
+            if (trackingStarted)
+            {
+                TrackObject();
+            }
         }
 
         /// <summary>
@@ -218,6 +244,9 @@ namespace ImgTest
             int width = bmp.Width;
             int height = bmp.Height;
 
+            int avgX = 0;
+            int avgY = 0;
+
             int pixelNumber = 0;
             //go through image, search for specified colour
             for (int counter = 0; counter < rgbValues.Length; counter += 3) //24bit image produced by webcam. +=3 because 3 channels: r, g, b.
@@ -236,32 +265,41 @@ namespace ImgTest
                 double crColour = 0.439 * rgbValues[counter + 2] - 0.368 * rgbValues[counter + 1] - 0.071 * rgbValues[counter] + 128;
                 double cbColour = -0.148 * rgbValues[counter + 2] - 0.291 * rgbValues[counter + 1] + 0.439 * rgbValues[counter] + 128;
 
+                if (startTrack)
+                {
+                    if (x == 320 && y == 240)
+                    {
+                        trackColour[0] = crColour;
+                        trackColour[1] = cbColour;
+                        startTrack = false;
+                    }
+                }
+
                 if (prevFrame.Length > 1)
                 {
                     double yColourPrev = 0.257 * prevFrame[counter + 2] + 0.504 * prevFrame[counter + 1] + 0.098 * prevFrame[counter] + 16;
                     double crColourPrev = 0.439 * prevFrame[counter + 2] - 0.368 * prevFrame[counter + 1] - 0.071 * prevFrame[counter] + 128;
                     double cbColourPrev = -0.148 * prevFrame[counter + 2] - 0.291 * prevFrame[counter + 1] + 0.439 * prevFrame[counter] + 128;
                     //test the colour threshold, and set min/max x/y values accordingly.
-                    //currently tests for skin
-                    //if (crColour > 130 && crColour < 150 && cbColour > 130 && cbColour < 145 && crColourPrev > 130 && crColourPrev < 150 && cbColourPrev > 130 && cbColourPrev < 145)
-                    if ((Math.Abs(middlePoint[0] - x) < 50 && Math.Abs(middlePoint[1] - y) < 50) || (middlePoint[0] == 0 && middlePoint[1] == 0) || framesSincelastSeen < 10)
+                    if ((Math.Abs(middlePoint[0] - x) < 40 && Math.Abs(middlePoint[1] - y) < 40) || (middlePoint[0] == 0 && middlePoint[1] == 0) || (framesSincelastSeen < 10 && framesSincelastSeen != 0))
                     {
-                        if (crColour > 175 && cbColour < 130)
+                        if (Math.Abs(crColour - trackColour[0]) < 10 && Math.Abs(cbColour - trackColour[1]) < 10)
                         {
                             rgbValues[counter] = 255;
                             rgbValues[counter + 1] = 255;
                             rgbValues[counter + 2] = 255;
                             pixelNumber++;
-                            avgPositionX += x;
-                            avgPositionY += y;
+                            avgX += x;
+                            avgY += y;
                         }
                     }
                 }
             }
+            //object disappeared
             if (pixelNumber != 0)
             {
-                avgPositionX /= pixelNumber;
-                avgPositionY /= pixelNumber;
+                avgPositionX = avgX / pixelNumber;
+                avgPositionY = avgY / pixelNumber;
                 framesSincelastSeen = 0;
             }
             else
@@ -287,23 +325,26 @@ namespace ImgTest
         private void TrackObject()
         {
             //if movement sequence is complete, determine the gesture and invoke its assigned method.
-            if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
-            {
-                int[] sequence = objTracker.ReturnSequence();
-                //test that a gesture exists
-                if (myGestures.ReturnGesture(sequence) != null) //gesture exists
+            if(prevMiddlePoint[0] != 0 && prevMiddlePoint[1] != 0 && middlePoint[0] != 0 && middlePoint[1] != 0){
+                if (objTracker.TrackPosition(DistanceMoved(), DirectionMoved()))
                 {
-                    //return gesture, then invoke method it holds if gesture returning have been initialized
-                    Gesture g = myGestures.ReturnGesture(sequence);
-                    if (initialized && g.GetName() != "Initialize")
+                    int[] sequence = objTracker.ReturnSequence();
+                    //test that a gesture exists
+                    //only test gesture if colour exists for at least one frame
+                    if (myGestures.ReturnGesture(sequence) != null) //gesture exists
                     {
-                        MethodInfo theMethod = typeof(Methods).GetMethod(g.GetFunction());
-                        theMethod.Invoke(methods, null);
-                    }
-                    //initialize gesture input if initialize gesture given
-                    else if (g.GetName() == "Initialize")
-                    {
-                        initialized = !initialized;
+                        //return gesture, then invoke method it holds if gesture returning have been initialized
+                        Gesture g = myGestures.ReturnGesture(sequence);
+                        if (initialized && g.GetName() != "Initialize")
+                        {
+                            MethodInfo theMethod = typeof(Methods).GetMethod(g.GetFunction());
+                            theMethod.Invoke(methods, null);
+                        }
+                        //initialize gesture input if initialize gesture given
+                        else if (g.GetName() == "Initialize")
+                        {
+                            initialized = !initialized;
+                        }
                     }
                 }
             }
@@ -419,7 +460,6 @@ namespace ImgTest
                 GestureInfoLabel.Text = str;
             }
 
-            label1.Text = prevMiddlePoint[0].ToString();
             //control mouse
             //Cursor.Position = new Point((int)(Screen.PrimaryScreen.Bounds.Width * ((double)middlePoint[0] / 640)), (int)(Screen.PrimaryScreen.Bounds.Height * ((double)middlePoint[1] / 480)));
         }
@@ -735,6 +775,12 @@ namespace ImgTest
         private void GestureLoadBtn_Click(object sender, EventArgs e)
         {
             LoadGestures();
+        }
+
+        private void SetTrack_Click(object sender, EventArgs e)
+        {
+            trackingStarted = true;
+            startTrack = true;
         }   
     }
 }

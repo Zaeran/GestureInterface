@@ -56,7 +56,7 @@ namespace ImgTest
                 else //direction has changed
                 {                  
                     //if moved far enough in a different direction to previous, add the direction to the sequence list
-                    if (distanceMoved > 25 && dirMoving != dirLastMoved)
+                    if (distanceMoved > 35 && dirMoving != dirLastMoved)
                     {
                         currentSequence.Add(dirMoving);
                         ticksSinceDirectionStarted = 0;
@@ -64,7 +64,7 @@ namespace ImgTest
                     }
                     distanceMoved = 0;
                     dirMoving = dir;
-                    if (dist > 100)
+                    if (dist > 100 && dirMoving != dirLastMoved)
                     {
                         currentSequence.Add(dirMoving);
                         ticksSinceDirectionStarted = 0;

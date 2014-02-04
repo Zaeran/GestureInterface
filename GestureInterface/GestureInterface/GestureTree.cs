@@ -32,9 +32,7 @@ namespace ImgTest
         public class Node
         {
             public Gesture gesture;
-            public int dirValue;
-            public List<Node> leafNodes;
-            public Node baseNode;
+            public Node[] leafNodes;
 
             /// <summary>
             /// Node constructor
@@ -42,12 +40,10 @@ namespace ImgTest
             /// <param name="g">The gesture assigned to the Node</param>
             /// <param name="d">the direction of this node from the previous node</param>
             /// <param name="bNode">the previous node</param>
-            public Node(Gesture g = null, int d = 0, Node bNode = null)
+            public Node(Gesture g = null)
             {
                 gesture = g;
-                dirValue = d;
-                baseNode = bNode;
-                leafNodes = new List<Node>();
+                leafNodes = new Node[8];
             }
         }
 
@@ -64,7 +60,7 @@ namespace ImgTest
             {
                 if (!NextDirExists(sequence[i]))
                 {
-                    currentNode.leafNodes.Add(new Node(null, sequence[i], currentNode));
+                    currentNode.leafNodes[sequence[i]] = new Node(null);
                     SelectNode(sequence[i]);
                 }
                 else
@@ -141,12 +137,9 @@ namespace ImgTest
         /// <returns>Returns true if node exists, false if not</returns>
         private bool NextDirExists(int dir)
         {
-            foreach (Node l in currentNode.leafNodes)
+            if (currentNode.leafNodes[dir] != null)
             {
-                if (l.dirValue == dir)
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
@@ -157,14 +150,7 @@ namespace ImgTest
         /// <param name="dir">The direction of the node to select</param>
         private void SelectNode(int dir)
         {
-            foreach (Node n in currentNode.leafNodes)
-            {
-                if (n.dirValue == dir)
-                {
-                    currentNode = n;
-                    break;
-                }
-            }
+            currentNode = currentNode.leafNodes[dir];
         }
 
         /// <summary>

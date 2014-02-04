@@ -7,7 +7,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using PowerPoint = Microsoft.Office.Interop.PowerPoint;
+using System.Media;
+
 
 namespace ImgTest
 {
@@ -37,6 +38,11 @@ namespace ImgTest
             MessageBox.Show("HELLO WORLD!");
         }
 
+        public void Sound()
+        {
+            SystemSounds.Beep.Play();
+        }
+
         public void OpenSong()
         {
             Process.Start(@"C:\\PicTest/06 - The Devil In The Wishing Well.mp3");
@@ -50,31 +56,69 @@ namespace ImgTest
             p.CloseMainWindow();
         }
 
-        public void NextSlidePPT()
+        public void One()
         {
-            if (Process.GetProcessesByName("POWERPNT").Length != 0)
-            {
-                PowerPoint.Application pptApp;
-                pptApp = (PowerPoint.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("PowerPoint.Application");
-                if (pptApp.SlideShowWindows.Count != 0)
-                {
-                    pptApp.ActivePresentation.SlideShowWindow.View.Next();
-                }
-            } 
+            SendKeys.SendWait("1");
         }
 
-        public void PrevSlidePPT()
+        public void Two()
         {
-            if (Process.GetProcessesByName("POWERPNT").Length != 0)
-            {
-                PowerPoint.Application pptApp;
-                pptApp = (PowerPoint.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("PowerPoint.Application");
-                if (pptApp.SlideShowWindows.Count != 0)
-                {
-                    pptApp.ActivePresentation.SlideShowWindow.View.Previous();
-                }
-            }
+            SendKeys.SendWait("2");
         }
 
+        public void Three()
+        {
+            SendKeys.SendWait("3");
+        }
+
+        public void Four()
+        {
+            SendKeys.SendWait("4");
+        }
+
+        public void Five()
+        {
+            SendKeys.SendWait("5");
+        }
+
+        public void Six()
+        {
+            SendKeys.SendWait("6");
+        }
+
+        public void Seven()
+        {
+            SendKeys.SendWait("7");
+        }
+
+        public void Eight()
+        {
+            SendKeys.SendWait("8");
+        }
+
+        public void Nine()
+        {
+            SendKeys.SendWait("9");
+        }
+
+        public void Zero()
+        {
+            SendKeys.SendWait("0");
+        }
+
+        public void OpenNotepad()
+        {
+            Process.Start(@"C:\Windows\system32\notepad.exe");
+        }
+
+        public void Tab()
+        {
+            SendKeys.SendWait("{TAB}");
+        }
+
+        public void Enter()
+        {
+            SendKeys.SendWait("~");
+        }
     }
 }

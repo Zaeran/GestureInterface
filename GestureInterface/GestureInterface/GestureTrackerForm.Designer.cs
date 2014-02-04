@@ -63,10 +63,10 @@
             this.GestureCurrentDescriptionVar = new System.Windows.Forms.Label();
             this.GestureCurrentDescriptionLabel = new System.Windows.Forms.Label();
             this.GestureDescriptionBox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.GestureSaveBtn = new System.Windows.Forms.Button();
             this.GestureLoadBtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.SetTrack = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PicBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -397,15 +397,6 @@
             this.GestureDescriptionBox.Size = new System.Drawing.Size(166, 20);
             this.GestureDescriptionBox.TabIndex = 33;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(229, 24);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 36;
-            this.label1.Text = "label1";
-            // 
             // GestureSaveBtn
             // 
             this.GestureSaveBtn.Location = new System.Drawing.Point(18, 740);
@@ -430,14 +421,24 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.textBoxTimerTick);
             // 
+            // SetTrack
+            // 
+            this.SetTrack.Location = new System.Drawing.Point(200, 13);
+            this.SetTrack.Name = "SetTrack";
+            this.SetTrack.Size = new System.Drawing.Size(157, 34);
+            this.SetTrack.TabIndex = 39;
+            this.SetTrack.Text = "TRACK COLOUR";
+            this.SetTrack.UseVisualStyleBackColor = true;
+            this.SetTrack.Click += new System.EventHandler(this.SetTrack_Click);
+            // 
             // GestureTrackerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(981, 775);
+            this.Controls.Add(this.SetTrack);
             this.Controls.Add(this.GestureLoadBtn);
             this.Controls.Add(this.GestureSaveBtn);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.GestureCurrentDescriptionVar);
             this.Controls.Add(this.GestureCurrentDescriptionLabel);
             this.Controls.Add(this.GestureDescriptionBox);
@@ -518,10 +519,10 @@
         private System.Windows.Forms.Label GestureCurrentDescriptionVar;
         private System.Windows.Forms.Label GestureCurrentDescriptionLabel;
         private System.Windows.Forms.TextBox GestureDescriptionBox;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button GestureSaveBtn;
         private System.Windows.Forms.Button GestureLoadBtn;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button SetTrack;
     }
 }
 
